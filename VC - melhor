@@ -1,0 +1,73 @@
+import cv2
+import os
+
+# Listas para armazenar as codificações conhecidas e os nomes dos objetos
+known_encodings = []
+known_names = []
+
+# Caminho para a pasta com suas imagens
+base_dir = 'C:\\Users\\pedro\\Downloads\\teste_vc'
+
+# Função para carregar e processar imagens
+def load_images(base_dir):
+    sift = cv2.SIFT_create()
+    for root, _, files in os.walk(base_dir):
+        for filename in files:
+            if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.tif')):
+                image_path = os.path.join(root, filename)
+                image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+                kp, des = sift.detectAndCompute(image, None)
+                if des is not None:
+                    known_encodings.append(des)
+                    known_names.append(os.path.basename(root))  # Nome da subpasta como nome do objeto
+
+# Carregar imagens
+load_images(base_dir)
+
+# Inicialização da câmera
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)  # Reduzir a resolução para 320x240
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+
+while True:
+    try:
+        ret, frame = cap.read()
+        if not ret:
+            print("Falha ao capturar imagem da câmera")
+            break
+
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        sift = cv2.SIFT_create()
+        kp_frame, des_frame = sift.detectAndCompute(gray_frame, None)
+
+        flann = cv2.FlannBasedMatcher()
+        object_found = False
+        object_name = None
+
+        # Comparar as descrições das imagens conhecidas com a imagem capturada
+        for des, name in zip(known_encodings, known_names):
+            matches = flann.knnMatch(des, des_frame, k=2)
+            good_matches = [m for m, n in matches if m.distance < 0.6 * n.distance]
+
+            if len(good_matches) > 15:  # Ajuste o número conforme necessário
+                object_found = True
+                object_name = name
+                break
+
+        if object_found:
+            print(f"Objeto reconhecido: {object_name}")
+            cv2.putText(frame, f"Objeto: {object_name}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        else:
+            cv2.putText(frame, "Objeto: Nao reconhecido", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+
+        cv2.imshow('Video', frame)
+
+        if cv2.waitKey(1) & 0xFF == 27:  # Pressione ESC para sair
+            break
+
+    except Exception as e:
+        print(f"Ocorreu um erro: {e}")
+        break
+
+cap.release()
+cv2.destroyAllWindows()
