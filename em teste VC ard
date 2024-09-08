@@ -1,5 +1,5 @@
 void setup() {
-  pinMode(3, OUTPUT);  // Configura o pino 3 como saída
+  pinMode(2, OUTPUT);  // Configura o pino 3 como saída
   Serial.begin(9600);
 }
 
@@ -7,9 +7,9 @@ void loop() {
   if (Serial.available() > 0) {
     char command = Serial.read();
     if (command == '1') {
-      digitalWrite(3, HIGH);  // Acende o LED no pino 3
+      digitalWrite(2, HIGH);  // Acende o LED no pino 3
     } else if (command == '0') {
-      digitalWrite(3, LOW);   // Apaga o LED no pino 3
+      digitalWrite(2, LOW);   // Apaga o LED no pino 3
     }
   }
 }
