@@ -1,45 +1,7 @@
-import requests
-from bs4 import BeautifulSoup
-import os
+from bing_image_downloader import downloader
 
-# Função para baixar uma imagem de uma URL
-def download_image(url, folder_path, image_name):
-    response = requests.get(url, stream=True)
-    if response.status_code == 200:
-        with open(os.path.join(folder_path, image_name), 'wb') as file:
-            for chunk in response.iter_content(1024):
-                file.write(chunk)
+def download_images(search_term, num_images=50):
+    downloader.download(search_term, limit=num_images, output_dir='C:\\Users\\pedro\\Downloads\\teste_vc', adult_filter_off=True, force_replace=False, timeout=60)
 
-# Criar a pasta para salvar as imagens
-folder_path = 'C:\\Users\\pedro\\Downloads\\teste_vc'
-if not os.path.exists(folder_path):
-    os.makedirs(folder_path)
-
-# URL de busca de imagens
-search_url = "https://www.google.com/search?q=cebolinha&tbm=isch"
-
-# Cabeçalhos para a requisição
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-}
-
-# Fazer a requisição e parsear o HTML
-response = requests.get(search_url, headers=headers)
-soup = BeautifulSoup(response.text, 'html.parser')
-
-# Encontrar todas as tags de imagem
-image_tags = soup.find_all('img')
-
-# Baixar exatamente 10 imagens
-downloaded_images = 0
-for i, img_tag in enumerate(image_tags):
-    if downloaded_images >= 10:
-        break
-    img_url = img_tag.get('src')
-    if img_url:
-        try:
-            download_image(img_url, folder_path, f'patolino_{downloaded_images + 1}.jpg')
-            print(f'Imagem {downloaded_images + 1} baixada com sucesso.')
-            downloaded_images += 1
-        except Exception as e:
-            print(f'Erro ao baixar a imagem {downloaded_images + 1}: {e}')
+# Exemplo de uso
+download_images('alexanrio', 10)
