@@ -1,7 +1,0 @@
-from bing_image_downloader import downloader
-
-def download_images(search_term, num_images=50):
-    downloader.download(search_term, limit=num_images, output_dir='C:\\Users\\pedro\\Downloads\\teste_vc', adult_filter_off=True, force_replace=False, timeout=60)
-
-# Exemplo de uso
-download_images('alexanrio', 10)
