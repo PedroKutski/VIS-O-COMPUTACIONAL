@@ -11,7 +11,7 @@ base_dir = 'C:\\Users\\pedro\\Downloads\\{LOCALDAPASTATREINAMENTO}'
 # Função para carregar e processar imagens
 def load_images(base_dir):
     sift = cv2.SIFT_create()
-    for root, _, files in os.walk(base_dir):
+    for root, _, files in  os.walk(base_dir):
         for filename in files:
             if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.tif')):
                 image_path = os.path.join(root, filename)
