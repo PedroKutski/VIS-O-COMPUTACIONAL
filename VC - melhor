@@ -1,5 +1,5 @@
-import cv2
-import os
+import cv2 #biblioteca openCV 
+import os #biblioteca para controle de arquivos e leitura 
 
 # Listas para armazenar as codificações conhecidas e os nomes dos objetos
 known_encodings = []
