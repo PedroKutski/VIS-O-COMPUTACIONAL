@@ -1,0 +1,36 @@
+import os
+import requests
+from bs4 import BeautifulSoup
+
+def criar_pasta(caminho):
+    if not os.path.exists(caminho):
+        os.makedirs(caminho)
+
+def baixar_imagem(url, caminho_pasta, nome_arquivo):
+    resposta = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+    if resposta.status_code == 200:
+        with open(os.path.join(caminho_pasta, nome_arquivo), 'wb') as arquivo:
+            arquivo.write(resposta.content)
+        print(f"Imagem salva como {nome_arquivo}")
+    else:
+        print(f"Falha ao baixar a imagem {nome_arquivo}")
+
+def buscar_imagens(pesquisa, caminho_base, quantidade=20):
+    caminho_pasta = os.path.join(caminho_base, pesquisa)
+    criar_pasta(caminho_pasta)
+    
+    url_pesquisa = f"https://www.google.com/search?tbm=isch&q={pesquisa}"
+    resposta = requests.get(url_pesquisa, headers={"User-Agent": "Mozilla/5.0"})
+    soup = BeautifulSoup(resposta.text, 'html.parser')
+    imagens = soup.find_all('img', limit=quantidade)
+    
+    for i, img in enumerate(imagens):
+        src = img.get('data-src') or img.get('data-iurl') or img.get('src')
+        if src and src.startswith('http'):
+            nome_arquivo = f"{pesquisa}_{i+1}.jpg"
+            baixar_imagem(src, caminho_pasta, nome_arquivo)
+
+# Exemplo de uso
+pesquisa = ""
+caminho_base = r"C:\\Users\\pedro\\Downloads\\teste_vc"
+buscar_imagens(pesquisa, caminho_base)
